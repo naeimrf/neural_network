@@ -1,2 +1,5 @@
-.idea/
-__pycache_/_
+.idea/*.*
+__pycache__/*.*
+ __pycache__/model.cpython-39.pyc
+__pycache__/utils.cpython-39.pyc
+
