@@ -28,6 +28,19 @@ model, _, _ = rebuild_the_model(input_args.checkpoint, input_args.gpu)
 
 # 4. predict flower classes with the highest probabilities
 k = input_args.top_k if input_args.top_k else 1
+
+probs, probs_rounded, classes = predict(img, model, k=k)
+
+# 5. Print and/or the result
+result(
+    input_args.input,
+    probs,
+    probs_rounded,
+    classes,
+    input_args.category_names,
+    plot=True,
+)
+
 probs, probs_rounded, classes = predict(img, model, k=k)
 
 # 5. Print and/or the result

@@ -1,5 +1,8 @@
 .idea/*.*
 __pycache__/*.*
+<<<<<<< HEAD
  __pycache__/model.cpython-39.pyc
 __pycache__/utils.cpython-39.pyc
+=======
+>>>>>>> b6bdd3ebf56dfef8162addf0d0337c34d949cbb0
 

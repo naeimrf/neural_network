@@ -60,6 +60,8 @@ def parse_predict_arguments():
 
     parser_predict.add_argument("--top_k", action="store", dest="top_k", type=int)
 
+    parser_predict.add_argument("--top_k", action="store", dest="top_k", type=int)
+
     parser_predict.add_argument(
         "--category_names", action="store", dest="category_names"
     )
