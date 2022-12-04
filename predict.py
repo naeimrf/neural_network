@@ -9,12 +9,27 @@
         * python predict.py input checkpoint --gpu
 * Output: the flower name and a class probability
 """
-from utils import parse_predict_arguments, load_json_file
+from utils import parse_predict_arguments, predict
+from utils import process_image, load_json_file
+from model import rebuild_the_model
+from utils import result
 
+# 1. Read command line arguments (options) for prediction part
 input_args = parse_predict_arguments()
 
+# 2. If any other json file provided, read it here
 if input_args.category_names:
     category_names = load_json_file(input_args.category_names)
+    print(f"-> Loading json file: {input_args.category_names}!")
 
-if __name__ == "__main__":
-    print(input_args)
+# 3. Prepare imported image and rebuild the model for prediction
+img = process_image(input_args.input)
+model, _, _ = rebuild_the_model(input_args.checkpoint, input_args.gpu)
+
+# 4. predict flower classes with the highest probabilities
+k = input_args.top_k if input_args.top_k else 1
+print(f"*********************************** {k, input_args.top_k}")
+probs, probs_rounded, classes = predict(img, model, k=k)
+
+# 5. Print and/or the result
+result(input_args.input, probs, probs_rounded, classes, input_args.category_names, plot=True)
