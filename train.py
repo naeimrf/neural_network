@@ -31,7 +31,7 @@ device = torch.device("cpu")
 if input_args.gpu:
     if torch.cuda.is_available():
         device = torch.device("cuda")
-        print(f"-> Number of available gpu units: {torch.cuda.device_count()}")
+        print(f"-> GPU activated. Number of available units: {torch.cuda.device_count()}")
     else:
         print("-> gpu was not available, switched to cpu!")
 
@@ -67,6 +67,7 @@ if first_layer == 0:
     )
 
 # 5. Train the model
+print(f"-> Training with:\n\t* Epochs: {input_args.epochs}\n\t* Learning_rate: {input_args.learning_rate}")
 criterion = nn.NLLLoss()
 if model_type == "classifier":
     optimizer = optim.Adam(model.classifier.parameters(), lr=input_args.learning_rate)
@@ -103,8 +104,10 @@ checkpoint = {
 }
 
 if input_args.save_dir:
+    if not os.path.exists(input_args.save_dir):
+        os.makedirs(input_args.save_dir)
     torch.save(checkpoint, f"{input_args.save_dir}/checkpoint.pth")
-    print(f"-> Files1: {os.listdir(input_args.save_dir)}")
+    print(f"-> Files in target folder: {os.listdir(input_args.save_dir)}")
 else:
     torch.save(checkpoint, "checkpoint.pth")
-    print(f"-> Files2: {os.listdir(os.getcwd())}")
+    print(f"-> Files in current path: {os.listdir(os.getcwd())}")

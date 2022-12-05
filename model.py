@@ -13,27 +13,48 @@ from torchvision import models
 
 
 def load_pretrained_model(model_name="vgg16_bn"):
-    all_models = torch.hub.list("pytorch/vision", force_reload=True)
+    # all_models = torch.hub.list("pytorch/vision", force_reload=True)
+    # if model_name in all_models and model_name != "inception":
+    # print(f"-> Loading pretrained model: {model_name}")
 
-    if model_name in all_models and model_name != "inception":
+    # model = getattr(torchvision.models, model_name)(pretrained=True)
+    # model = torch.hub.load("pytorch/vision", model_name, pretrained=True)
+
+    a_few_models = ["vgg13", "vgg16_bn", "vgg19", "resnet34", "resnet152", "densenet201"]
+    if model_name in a_few_models:
         print(f"-> Loading pretrained model: {model_name}")
 
-        # model = getattr(torchvision.models, model_name)(pretrained=True)
-        model = torch.hub.load("pytorch/vision", model_name, pretrained=True)
+    if model_name == 'vgg13':
+        model = models.vgg13(pretrained=True)
 
-        # Freeze feature parameters
-        for param in model.parameters():
-            param.requires_grad = False
+    elif model_name == 'vgg16_bn':
+        model = models.vgg16_bn(pretrained=True)
 
-        return model
+    elif model_name == 'vgg19':
+        model = models.vgg19(pretrained=True)
+
+    # small model to run parse options
+    elif model_name == 'resnet34':
+        model = models.resnet34(pretrained=True)
+
+    elif model_name == 'resnet152':
+        model = models.resnet152(pretrained=True)
+
+    elif model_name == 'densenet201':
+        model = models.densenet201(pretrained=True)
+
     else:
         exit(
             f"-> No such model architecture!\n"
             f"-> Check your model name for typo and try again!\n"
-            f"-> For models: resnet, inception, alexnet, vgg, squeezenet, densenet\n"
-            f"-> inception model expects (299,299) sized images, won't work for now!\n"
-            f"-> Find your variant: {all_models}"
+            f"-> Please select from: {a_few_models}"
         )
+
+    # Freeze feature parameters
+    for param in model.parameters():
+        param.requires_grad = False
+
+    return model
 
 
 class Classifier(nn.Module):
@@ -66,7 +87,7 @@ def train_model(e, model, criterion, optimizer, t_loader, v_loader, device):
     train_loss = 0
     train_losses, valid_losses = [], []
 
-    print(f"-> Train the model stared... ")
+    print(f"-> Train the model started... ")
     start = time.time()
     for e in range(epochs):
         for images, labels in t_loader:
