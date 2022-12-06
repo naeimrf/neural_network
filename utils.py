@@ -57,14 +57,8 @@ def parse_predict_arguments():
     print(parser_predict.description)
     parser_predict.add_argument("input", action="store")
     parser_predict.add_argument("checkpoint", action="store")
-
     parser_predict.add_argument("--top_k", action="store", dest="top_k", type=int)
-
-    parser_predict.add_argument("--top_k", action="store", dest="top_k", type=int)
-
-    parser_predict.add_argument(
-        "--category_names", action="store", dest="category_names"
-    )
+    parser_predict.add_argument("--category_names", action="store", dest="category_names")
     parser_predict.add_argument("--gpu", action="store_true", default=False)
 
     return parser_predict.parse_args()

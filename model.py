@@ -178,7 +178,7 @@ def check_accuracy(model, testset, device):
 
 
 def rebuild_the_model(pth_path, gpu):
-    checkpoint = torch.load(pth_path)
+    checkpoint = torch.load(pth_path, map_location='cpu')
 
     # Load the pre-trained model
     model = load_pretrained_model(checkpoint["arch"])
@@ -221,3 +221,36 @@ def rebuild_the_model(pth_path, gpu):
 
     print(f"-> Rebuilding the model {checkpoint['arch']} done!")
     return model, new_criterion, new_optimizer
+
+
+def rebuild_simple(pth_path, gpu):
+    checkpoint = torch.load(pth_path, map_location='cpu')
+
+    # Load the pre-trained model
+    model = load_pretrained_model(checkpoint["arch"])
+    for param in model.parameters():
+        param.requires_grad = False
+
+    first_layer = checkpoint["input_size"]
+    output_size = checkpoint["output_size"]
+    layers_inside = checkpoint["layers_inside"]
+    dp = checkpoint["dropout_p"]
+
+    if checkpoint["model_type"] == "classifier":
+        model.classifier = Classifier(first_layer, output_size, layers_inside, dp)
+    if checkpoint["model_type"] == "fc":
+        model.fc = Classifier(first_layer, output_size, layers_inside, dp)
+
+    model.load_state_dict(checkpoint["state_dict"])
+    model.class_to_idx = checkpoint["class_to_index"]
+
+    if gpu:
+        if torch.cuda.is_available():
+            device = torch.device("cuda")
+            model.to(device)
+            print(f"-> Activating gpu done.")
+        else:
+            print(f"-> pgu is not available!")
+
+    print(f"-> Rebuilding the model {checkpoint['arch']} done!")
+    return model
