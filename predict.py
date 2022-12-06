@@ -11,7 +11,7 @@
 """
 from utils import parse_predict_arguments, predict
 from utils import process_image, load_json_file
-from model import rebuild_the_model
+from model import rebuild_the_model, rebuild_simple
 from utils import result
 
 # 1. Read command line arguments (options) for prediction part
@@ -24,31 +24,19 @@ if input_args.category_names:
 
 # 3. Prepare imported image and rebuild the model for prediction
 img = process_image(input_args.input)
-model, _, _ = rebuild_the_model(input_args.checkpoint, input_args.gpu)
+model = rebuild_simple(input_args.checkpoint, input_args.gpu)
 
 # 4. predict flower classes with the highest probabilities
 k = input_args.top_k if input_args.top_k else 1
 
 probs, probs_rounded, classes = predict(img, model, k=k)
 
-# 5. Print and/or the result
+# 5. Print and/or plot the result
 result(
     input_args.input,
     probs,
     probs_rounded,
     classes,
     input_args.category_names,
-    plot=True,
-)
-
-probs, probs_rounded, classes = predict(img, model, k=k)
-
-# 5. Print and/or the result
-result(
-    input_args.input,
-    probs,
-    probs_rounded,
-    classes,
-    input_args.category_names,
-    plot=True,
+    plot=False,
 )
