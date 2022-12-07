@@ -96,10 +96,11 @@ checkpoint = {
     "output_size": 102,
     "layers_inside": hidden_layers,
     "dropout_p": 0.5,
-    "class_to_index": model.class_to_idx,
+    "class_to_index": train_data.class_to_idx,
     "state_dict": model.state_dict(),
     "optim_dict": optimizer.state_dict(),
     "model_type": model_type,
+    "crit_dict": criterion.state_dict(),
     "learning_rate": input_args.learning_rate,
 }
 

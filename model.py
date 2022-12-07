@@ -178,7 +178,12 @@ def check_accuracy(model, testset, device):
 
 
 def rebuild_the_model(pth_path, gpu):
-    checkpoint = torch.load(pth_path, map_location='cpu')
+    # Loading checkpoint
+    if torch.cuda.is_available():
+        ml = "cuda:0"
+    else:
+        ml = 'cpu'
+    checkpoint = torch.load(pth_path, map_location=ml)
 
     # Load the pre-trained model
     model = load_pretrained_model(checkpoint["arch"])
@@ -197,19 +202,14 @@ def rebuild_the_model(pth_path, gpu):
         model.fc = Classifier(first_layer, output_size, layers_inside, dp)
 
     model.load_state_dict(checkpoint["state_dict"])
-    new_criterion = nn.NLLLoss()
-
-    if checkpoint["model_type"] == "classifier":
-        new_optimizer = optim.Adam(
-            model.classifier.parameters(), lr=checkpoint["learning_rate"]
-        )
-    else:
-        new_optimizer = optim.Adam(
-            model.fc.parameters(), lr=checkpoint["learning_rate"]
-        )
-
-    new_optimizer.load_state_dict(checkpoint["optim_dict"])
     model.class_to_idx = checkpoint["class_to_index"]
+
+    epochs = checkpoint['epochs']
+    learning_rate = checkpoint['learning_rate']
+
+    # Return saved values for other parts
+    criterion = checkpoint['criterion_state_dict']
+    optimizer = checkpoint['optimizer_state_dict']
 
     if gpu:
         if torch.cuda.is_available():
@@ -220,17 +220,22 @@ def rebuild_the_model(pth_path, gpu):
             print(f"-> pgu is not available!")
 
     print(f"-> Rebuilding the model {checkpoint['arch']} done!")
-    return model, new_criterion, new_optimizer
+    return model, epochs, learning_rate, optimizer, criterion
 
 
 def rebuild_simple(pth_path, gpu):
-    checkpoint = torch.load(pth_path, map_location='cpu')
+    if torch.cuda.is_available():
+        ml = "cuda:0"
+    else:
+        ml = 'cpu'
+    checkpoint = torch.load(pth_path, map_location=ml)
 
     # Load the pre-trained model
     model = load_pretrained_model(checkpoint["arch"])
     for param in model.parameters():
         param.requires_grad = False
 
+    # Unpacking checkpoint
     first_layer = checkpoint["input_size"]
     output_size = checkpoint["output_size"]
     layers_inside = checkpoint["layers_inside"]
@@ -248,9 +253,9 @@ def rebuild_simple(pth_path, gpu):
         if torch.cuda.is_available():
             device = torch.device("cuda")
             model.to(device)
-            print(f"-> Activating gpu done.")
+            print(f"-> GPU Activated.")
         else:
-            print(f"-> pgu is not available!")
+            print(f"-> GPU is not available!")
 
     print(f"-> Rebuilding the model {checkpoint['arch']} done!")
     return model

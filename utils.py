@@ -191,28 +191,30 @@ def predict(image, model, k=3):
     """
     Predict the class (or classes) of an image using a trained deep learning model.
     """
-    im = torch.from_numpy(image).float()
+    model.eval()
+    with torch.no_grad():
+        im = torch.from_numpy(image).float()
 
-    # From Batch * Channel * Height * Width to 1 picture CxHxW
-    im = im.unsqueeze(0)
+        # From Batch * Channel * Height * Width to 1 picture CxHxW
+        im = im.unsqueeze(0)
 
-    model.cpu()
-    log = model.forward(im)
-    probs = torch.exp(log)
-    probs, indices = probs.topk(k)
+        model.cpu()
+        log = model.forward(im)
+        probs = torch.exp(log)
+        probs, indices = probs.topk(k)
 
-    classes = []
-    indices = indices.detach().numpy()[0]
-    for idx in indices:
-        for class_, index in model.class_to_idx.items():
-            if idx == index:
-                classes.append(class_)
+        classes = []
+        indices = indices.detach().numpy()[0]
+        for idx in indices:
+            for class_, index in model.class_to_idx.items():
+                if idx == index:
+                    classes.append(class_)
 
-    probs = probs.detach().numpy()[0]
+        probs = probs.detach().numpy()[0]
 
-    probs_rounded = list(map(lambda x: round(x, 3), probs))
+        probs_rounded = list(map(lambda x: round(x, 3), probs))
 
-    return probs, probs_rounded, classes
+        return probs, probs_rounded, classes
 
 
 def result(flower_path, probs, probs_rounded, classes, json_file=None, plot=False):

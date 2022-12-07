@@ -11,7 +11,7 @@
 """
 from utils import parse_predict_arguments, predict
 from utils import process_image, load_json_file
-from model import rebuild_the_model, rebuild_simple
+from model import rebuild_simple
 from utils import result
 
 # 1. Read command line arguments (options) for prediction part
